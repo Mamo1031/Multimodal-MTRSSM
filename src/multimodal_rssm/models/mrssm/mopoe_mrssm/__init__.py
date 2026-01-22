@@ -9,13 +9,10 @@ from multimodal_rssm.models.objective import likelihood
 from multimodal_rssm.models.state import State, cat_states, stack_states
 from multimodal_rssm.models.transform import (
     GaussianNoise,
-    NormalizeAction,
     NormalizeAudioMelSpectrogram,
     NormalizeVisionImage,
-    RandomWindow,
     RemoveDim,
-    RemoveHead,
-    RemoveTail,
+    TakeFirstN,
 )
 
 __all__ = [
@@ -24,13 +21,9 @@ __all__ = [
     "GaussianNoise",
     "LogMoPoEMRSSMOutput",
     "MoPoE_MRSSM",
-    "NormalizeAction",
     "NormalizeAudioMelSpectrogram",
     "NormalizeVisionImage",
-    "RandomWindow",
     "RemoveDim",
-    "RemoveHead",
-    "RemoveTail",
     "Representation",
     "State",
     "Transition",

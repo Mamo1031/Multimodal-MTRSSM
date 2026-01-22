@@ -63,7 +63,7 @@ model:
       init_args:
         config:
           linear_sizes: [64, 1024]
-          conv_in_shape: [64, 8, 8]
+          conv_in_shape: [64, 4, 4]
           activation_name: ELU
           out_activation_name: Tanh
           channels: [32, 16, 1]
@@ -79,7 +79,7 @@ model:
       init_args:
         config:
           linear_sizes: [64, 1024]
-          conv_in_shape: [64, 8, 8]
+          conv_in_shape: [64, 4, 4]
           activation_name: ELU
           out_activation_name: Tanh
           channels: [32, 16, 1]
@@ -180,7 +180,6 @@ data:
             - class_path: multimodal_rssm.models.transform.TakeFirstN
               init_args:
                 n: 30
-            - class_path: multimodal_rssm.models.transform.RemoveTail
             - class_path: multimodal_rssm.models.transform.GaussianNoise
       action_target_transform:
         class_path: torchvision.transforms.Compose
@@ -189,7 +188,6 @@ data:
             - class_path: multimodal_rssm.models.transform.TakeFirstN
               init_args:
                 n: 30
-            - class_path: multimodal_rssm.models.transform.RemoveHead
       audio_observation_input_transform:
         class_path: torchvision.transforms.Compose
         init_args:
@@ -197,7 +195,6 @@ data:
             - class_path: multimodal_rssm.models.transform.TakeFirstN
               init_args:
                 n: 30
-            - class_path: multimodal_rssm.models.transform.RemoveTail
             - class_path: multimodal_rssm.models.transform.GaussianNoise
       audio_observation_target_transform:
         class_path: torchvision.transforms.Compose
@@ -206,7 +203,6 @@ data:
             - class_path: multimodal_rssm.models.transform.TakeFirstN
               init_args:
                 n: 30
-            - class_path: multimodal_rssm.models.transform.RemoveHead
       vision_observation_input_transform:
         class_path: torchvision.transforms.Compose
         init_args:
@@ -214,7 +210,6 @@ data:
             - class_path: multimodal_rssm.models.transform.TakeFirstN
               init_args:
                 n: 30
-            - class_path: multimodal_rssm.models.transform.RemoveTail
             - class_path: multimodal_rssm.models.transform.GaussianNoise
       vision_observation_target_transform:
         class_path: torchvision.transforms.Compose
@@ -223,4 +218,3 @@ data:
             - class_path: multimodal_rssm.models.transform.TakeFirstN
               init_args:
                 n: 30
-            - class_path: multimodal_rssm.models.transform.RemoveHead
