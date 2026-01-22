@@ -701,47 +701,8 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
         # Convert LightningCLI format (class_path + init_args) to hydra format (_target_ + direct params)
         def convert_lightning_to_hydra(cfg):
             """Convert LightningCLI config format to hydra format."""
-            # #region agent log
-            import json
-
-            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                f.write(
-                    json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "A",
-                        "location": "evaluate_word_transitions.py:588",
-                        "message": "convert_lightning_to_hydra entry",
-                        "data": {
-                            "cfg_type": str(type(cfg)),
-                            "is_dict": isinstance(cfg, dict),
-                            "has_omega_conf": hasattr(OmegaConf, "DictConfig"),
-                            "omega_conf_attrs": dir(OmegaConf)[:10],
-                        },
-                        "timestamp": int(__import__("time").time() * 1000),
-                    })
-                    + "\n"
-                )
-            # #endregion
-
             # Use OmegaConf.is_config() which works across all versions
             is_omega_conf = OmegaConf.is_config(cfg)
-
-            # #region agent log
-            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                f.write(
-                    json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "A",
-                        "location": "evaluate_word_transitions.py:600",
-                        "message": "after type check",
-                        "data": {"is_omega_conf": is_omega_conf},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    })
-                    + "\n"
-                )
-            # #endregion
 
             if isinstance(cfg, dict) or is_omega_conf:
                 # Convert OmegaConf to dict if needed
@@ -754,57 +715,12 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
                     if "init_args" in cfg:
                         # Recursively convert nested configs
                         for key, value in cfg["init_args"].items():
-                            # #region agent log
-                            import json
-
-                            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                                f.write(
-                                    json.dumps({
-                                        "sessionId": "debug-session",
-                                        "runId": "run1",
-                                        "hypothesisId": "D",
-                                        "location": "evaluate_word_transitions.py:641",
-                                        "message": "processing init_args key",
-                                        "data": {
-                                            "key": key,
-                                            "value_type": str(type(value)),
-                                            "is_dict": isinstance(value, dict),
-                                            "has_class_path": isinstance(value, dict) and "class_path" in value
-                                            if isinstance(value, dict)
-                                            else False,
-                                        },
-                                        "timestamp": int(__import__("time").time() * 1000),
-                                    })
-                                    + "\n"
-                                )
-                            # #endregion
                             # For "config" parameter (plain dict without class_path), convert to appropriate config class
                             # This is needed because cnn.Encoder/Decoder expects config as EncoderConfig/DecoderConfig dataclass
                             if key == "config" and isinstance(value, dict) and "class_path" not in value:
                                 # Determine which config class to use based on parent class_path
                                 # We need to check the parent's class_path to know if it's Encoder or Decoder
                                 parent_class_path = cfg.get("class_path", "")
-                                # #region agent log
-                                import json
-
-                                with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                                    f.write(
-                                        json.dumps({
-                                            "sessionId": "debug-session",
-                                            "runId": "run1",
-                                            "hypothesisId": "D",
-                                            "location": "evaluate_word_transitions.py:644",
-                                            "message": "converting config to dataclass",
-                                            "data": {
-                                                "key": key,
-                                                "parent_class_path": parent_class_path,
-                                                "value_type": str(type(value)),
-                                            },
-                                            "timestamp": int(__import__("time").time() * 1000),
-                                        })
-                                        + "\n"
-                                    )
-                                # #endregion
 
                                 # Convert dict to appropriate config dataclass
                                 if "Encoder" in parent_class_path:
@@ -847,25 +763,6 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
                                 else:
                                     # Fallback: use OmegaConf if we can't determine the type
                                     result[key] = OmegaConf.create(value)
-
-                                # #region agent log
-                                with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                                    f.write(
-                                        json.dumps({
-                                            "sessionId": "debug-session",
-                                            "runId": "run1",
-                                            "hypothesisId": "D",
-                                            "location": "evaluate_word_transitions.py:680",
-                                            "message": "after converting config to dataclass",
-                                            "data": {
-                                                "result_type": str(type(result[key])),
-                                                "has_coord_conv": hasattr(result[key], "coord_conv"),
-                                            },
-                                            "timestamp": int(__import__("time").time() * 1000),
-                                        })
-                                        + "\n"
-                                    )
-                                # #endregion
                             else:
                                 result[key] = convert_lightning_to_hydra(value)
                     return result
@@ -881,29 +778,10 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
 
         hydra_config = convert_lightning_to_hydra(model_config)
 
-        # #region agent log
-        import json
-
-        with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-            f.write(
-                json.dumps({
-                    "sessionId": "debug-session",
-                    "runId": "run1",
-                    "hypothesisId": "B",
-                    "location": "evaluate_word_transitions.py:610",
-                    "message": "after convert_lightning_to_hydra",
-                    "data": {"hydra_config_type": str(type(hydra_config)), "is_dict": isinstance(hydra_config, dict)},
-                    "timestamp": int(__import__("time").time() * 1000),
-                })
-                + "\n"
-            )
-        # #endregion
-
         # Ensure it's a regular dict (not OmegaConf)
         if OmegaConf.is_config(hydra_config):
             hydra_config = OmegaConf.to_container(hydra_config, resolve=True)
 
-        # Debug: Check if _target_ exists
         if not isinstance(hydra_config, dict) or "_target_" not in hydra_config:
             raise ValueError(
                 f"Invalid config structure. Expected dict with '_target_', got: {type(hydra_config)}. "
@@ -923,61 +801,12 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
         except (ImportError, AttributeError) as e:
             raise ValueError(f"Failed to import class {target_class}: {e}") from e
 
-        # #region agent log
-        with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-            f.write(
-                json.dumps({
-                    "sessionId": "debug-session",
-                    "runId": "run1",
-                    "hypothesisId": "C",
-                    "location": "evaluate_word_transitions.py:700",
-                    "message": "before instantiate",
-                    "data": {
-                        "target_class": hydra_config.get("_target_", "N/A"),
-                        "config_keys": list(hydra_config.keys())[:5],
-                    },
-                    "timestamp": int(__import__("time").time() * 1000),
-                })
-                + "\n"
-            )
-        # #endregion
-
         # Use instantiate with _convert_="none" to preserve all objects including dataclasses
         # This prevents instantiate from trying to convert EncoderConfig/DecoderConfig to OmegaConf
         # If instantiate fails, fall back to direct instantiation
         try:
             model = instantiate(hydra_config, _convert_="none")
-            # #region agent log
-            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                f.write(
-                    json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "C",
-                        "location": "evaluate_word_transitions.py:705",
-                        "message": "after instantiate success",
-                        "data": {"model_type": str(type(model)), "is_mopoe": isinstance(model, MoPoE_MMTRSSM)},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    })
-                    + "\n"
-                )
-            # #endregion
         except Exception as e:
-            # #region agent log
-            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                f.write(
-                    json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "C",
-                        "location": "evaluate_word_transitions.py:725",
-                        "message": "instantiate failed",
-                        "data": {"error_type": str(type(e).__name__), "error_message": str(e)},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    })
-                    + "\n"
-                )
-            # #endregion
             # If instantiate fails, try direct instantiation
             import warnings
 
@@ -988,37 +817,6 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
             # Recursively instantiate nested configs
             # Use direct instantiation to avoid OmegaConf conversion issues with dataclasses
             def instantiate_nested(value):
-                # #region agent log
-                import json
-                import dataclasses
-                from omegaconf import OmegaConf
-
-                with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                    f.write(
-                        json.dumps({
-                            "sessionId": "debug-session",
-                            "runId": "run1",
-                            "hypothesisId": "E",
-                            "location": "evaluate_word_transitions.py:875",
-                            "message": "instantiate_nested entry",
-                            "data": {
-                                "value_type": str(type(value)),
-                                "is_dict": isinstance(value, dict),
-                                "is_dataclass": dataclasses.is_dataclass(value)
-                                if not isinstance(value, (dict, list, str, int, float, bool, type(None)))
-                                else False,
-                                "is_omegaconf": OmegaConf.is_config(value)
-                                if not isinstance(value, (str, int, float, bool, type(None)))
-                                else False,
-                                "has_target": isinstance(value, dict) and "_target_" in value
-                                if isinstance(value, dict)
-                                else False,
-                            },
-                            "timestamp": int(__import__("time").time() * 1000),
-                        })
-                        + "\n"
-                    )
-                # #endregion
                 if isinstance(value, dict) and "_target_" in value:
                     # Direct instantiation for nested classes
                     target = value["_target_"]
@@ -1045,57 +843,7 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
                                 # If conversion fails, keep the original value
                                 pass
 
-                        # #region agent log
-                        with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                            f.write(
-                                json.dumps({
-                                    "sessionId": "debug-session",
-                                    "runId": "run1",
-                                    "hypothesisId": "E",
-                                    "location": "evaluate_word_transitions.py:900",
-                                    "message": "before nested class instantiation",
-                                    "data": {
-                                        "target": target,
-                                        "nested_init_args_keys": list(nested_init_args.keys()),
-                                        "config_type": str(type(nested_init_args.get("config")))
-                                        if "config" in nested_init_args
-                                        else "N/A",
-                                        "config_is_dataclass": dataclasses.is_dataclass(nested_init_args.get("config"))
-                                        if "config" in nested_init_args
-                                        else False,
-                                        "config_is_omegaconf": OmegaConf.is_config(nested_init_args.get("config"))
-                                        if "config" in nested_init_args
-                                        else False,
-                                    },
-                                    "timestamp": int(__import__("time").time() * 1000),
-                                })
-                                + "\n"
-                            )
-                        # #endregion
                         result = nested_cls(**nested_init_args)
-                        # #region agent log
-                        with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                            f.write(
-                                json.dumps({
-                                    "sessionId": "debug-session",
-                                    "runId": "run1",
-                                    "hypothesisId": "E",
-                                    "location": "evaluate_word_transitions.py:920",
-                                    "message": "after nested class instantiation",
-                                    "data": {
-                                        "target": target,
-                                        "result_type": str(type(result)),
-                                        "has_config": hasattr(result, "config"),
-                                        "config_type": str(type(result.config)) if hasattr(result, "config") else "N/A",
-                                        "config_is_omegaconf": OmegaConf.is_config(result.config)
-                                        if hasattr(result, "config")
-                                        else False,
-                                    },
-                                    "timestamp": int(__import__("time").time() * 1000),
-                                })
-                                + "\n"
-                            )
-                        # #endregion
                         return result
                     except (ImportError, AttributeError) as e:
                         raise ValueError(f"Failed to import class {target}: {e}") from e
@@ -1107,41 +855,10 @@ def load_model(checkpoint_path: str, config_path: str | None = None) -> MoPoE_MM
                     return value
 
             init_args = {k: instantiate_nested(v) for k, v in init_args.items()}
-            # #region agent log
-            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                f.write(
-                    json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "C",
-                        "location": "evaluate_word_transitions.py:740",
-                        "message": "before direct instantiation",
-                        "data": {"init_args_keys": list(init_args.keys())[:5]},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    })
-                    + "\n"
-                )
-            # #endregion
             model = cls(**init_args)
-            # #region agent log
-            with open("/home/murata-lab/m_ota/.cursor/debug.log", "a") as f:
-                f.write(
-                    json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "C",
-                        "location": "evaluate_word_transitions.py:755",
-                        "message": "after direct instantiation",
-                        "data": {"model_type": str(type(model)), "is_mopoe": isinstance(model, MoPoE_MMTRSSM)},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    })
-                    + "\n"
-                )
-            # #endregion
 
         # Verify model is actually instantiated (not a config object)
         if not isinstance(model, MoPoE_MMTRSSM):
-            # If it's still a dict, try to debug
             if isinstance(model, dict):
                 raise ValueError(
                     f"Failed to instantiate model. Got dict. "
@@ -1290,13 +1007,6 @@ def main() -> None:
     )
     print(f"Loaded {len(test_data)} test samples")
 
-    # Debug: Check first sample's label structure
-    if len(test_data) > 0:
-        first_labels = test_data[0]["label"]
-        print(f"First sample label shape: {first_labels.shape}")
-        print(f"First sample label unique values: {np.unique(first_labels)}")
-        print(f"First sample label sample (first 50): {first_labels[:50]}")
-
     # Create transforms
     audio_transform = NormalizeAudioMelSpectrogram(min_value=-80.0, max_value=0.0)
     vision_transform = NormalizeVisionImage()
@@ -1317,9 +1027,6 @@ def main() -> None:
 
         if len(intervals) == 0:
             print(f"Warning: No intervals found for word {word}")
-            # Debug: Check why no intervals were found
-            word_count = sum(1 for data in test_data if np.any(data["label"] == word))
-            print(f"  Word {word} appears in {word_count} test samples")
             # Still compute true distribution and baselines for comparison
             p_dist = compute_true_distribution(word, test_data, word_set)
             baselines = compute_baselines(p_dist, word_set)
@@ -1356,13 +1063,6 @@ def main() -> None:
 
         # Compute true distribution (use all frames, not just query_length)
         p_dist = compute_true_distribution(word, test_data, word_set)
-
-        # Debug: Print distributions
-        print(f"  Prediction distribution: {q_dist}")
-        print(f"  True distribution: {p_dist}")
-        print(f"  Total predictions: {len(all_predictions)}")
-        if len(all_predictions) > 0:
-            print(f"  Prediction counts: {dict(Counter(all_predictions))}")
 
         # Compute MR
         mopoe_mr = compute_matching_rate(q_dist, p_dist, word_set)
