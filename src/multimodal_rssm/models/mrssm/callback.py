@@ -593,7 +593,7 @@ class LogMultimodalMRSSMOutput(BaseLogRSSMOutput):
         vision_label_y = top_padding + 5
         audio_label_y = vision_y_end + 5
 
-        for row_name, row_y in [("Vision", vision_label_y), ("Audio", audio_label_y)]:
+        for row_name, row_y in [("v", vision_label_y), ("a", audio_label_y)]:
             if font:
                 row_bbox = draw.textbbox((row_label_x, row_y), row_name, font=font)
             else:
@@ -628,7 +628,7 @@ class LogMultimodalMRSSMOutput(BaseLogRSSMOutput):
             audio_y_end: Y position where audio row ends
             font: Font to use
         """
-        captions = ["prior", "observation", "posterior"]
+        captions = ["p", "o", "q"]
         caption_y = audio_y_end + 5
 
         for i, caption in enumerate(captions):
