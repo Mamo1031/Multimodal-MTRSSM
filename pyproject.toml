@@ -1,0 +1,104 @@
+[project]
+name = "multimodal-mtrssm"
+version = "0.0.1"
+description = "Multimodal MTRSSM (vision/audio/action) with MoPoE"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Mamoru Ota" }]
+dependencies = [
+  "lightning[extra]>=2.4.0",
+  "torchrl>=0.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.11.2",
+    "poethepoet>=0.29.0",
+    "pydoclint>=0.5.9",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.8",
+]
+train = [
+    "cnn",
+    "distribution-extension",
+    "gdown>=5.2.0",
+    "torchvision>=0.19.1",
+    "wandb[media]>=0.18.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/multimodal_rssm"]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+distribution-extension = { git = "https://github.com/nomutin/distribution-extension" }
+cnn = { git = "https://github.com/nomutin/CNN.git" }
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+mypy_path = "src"
+explicit_package_bases = true
+disable_error_code = ["override"]
+
+[tool.pyright]
+reportMissingImports = "none"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+preview = true
+select = ["ALL"]
+ignore = ["CPY001"]
+fixable = ["ALL"]
+unfixable = []
+exclude = [".git", ".ruff_cache", ".venv",]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+preview = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["multimodal_rssm"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/multimodal_rssm/models/rssm/core.py" = ["PLR0913", "PLR6301"]
+"src/multimodal_rssm/models/rssm/networks.py" = ["PLR0913"]
+"src/multimodal_rssm/models/mrssm/nn_mrssm/core.py" = ["PLR0913", "N801", "PLR6301"]
+"src/multimodal_rssm/models/rssm/callback.py" = ["PLR0914", "PLR0912", "PLR0915", "C901", "PLR6301"]
+"src/multimodal_rssm/models/mrssm/nn_mrssm/callback.py" = ["PLR0914", "PLR0912", "PLR0915", "C901", "PLR0913", "PLR0917", "PLR6301", "PLR2004"]
+"src/multimodal_rssm/models/callback.py" = ["PLR6301", "C901", "PLR0912", "PLR0915", "PLR0914", "TRY300"]
+"src/multimodal_rssm/models/dataset.py" = ["DOC501", "DOC502"]
+"tests/*.py" = ["S101", "DOC201", "N801", "PLR6301", "PLR2004", "SLF001", "ANN401"]
+"scripts/*.py" = ["PLC2701"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.pydoclint]
+style = 'numpy'
+exclude = '\.git|\.ruff_cache|\.mypy_cache|\.venv'
+
+[tool.poe.tasks]
+lint-ruff = "ruff check --fix ."
+lint-ruff-check = "ruff check ."
+lint-mypy = "mypy ."
+lint-mypy-check = "mypy ."
+lint-pydoclint = "pydoclint ."
+lint = ["lint-ruff", "lint-mypy",]
+lint-ci = ["lint-ruff-check", "lint-mypy"]
+test = "pytest . --doctest-modules -ra --cov=src --cov-report=term --cov-report=xml"
+
+[tool.poe.tasks.train-mopoe-mrssm]
+cmd = "uv run python scripts/train_mopoe_mrssm.py"
+
+[tool.poe.tasks.train-mopoe-mmtrssm]
+cmd = "uv run python scripts/train_mopoe_mmtrssm.py"
