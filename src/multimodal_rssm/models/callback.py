@@ -186,7 +186,9 @@ class BaseLogRSSMOutput(Callback, ABC):
 
         for stage in ("train", "val"):
             all_episodes = self._collect_episodes(trainer, pl_module, stage)
-            for episode_idx, episode in enumerate(all_episodes):
+            # Limit to 7 episodes per stage for visualization
+            limited_episodes = all_episodes[:7]
+            for episode_idx, episode in enumerate(limited_episodes):
                 self._process_episode(episode, pl_module, stage, episode_idx, logger)
 
     def on_train_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
@@ -202,7 +204,9 @@ class BaseLogRSSMOutput(Callback, ABC):
         # Visualize with the best model
         for stage in ("train", "val"):
             all_episodes = self._collect_episodes(trainer, best_model, stage)
-            for episode_idx, episode in enumerate(all_episodes):
+            # Limit to 7 episodes per stage for visualization
+            limited_episodes = all_episodes[:7]
+            for episode_idx, episode in enumerate(limited_episodes):
                 self._process_episode(episode, best_model, stage, episode_idx, logger)
 
     @abstractmethod
