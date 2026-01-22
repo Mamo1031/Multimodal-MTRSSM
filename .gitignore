@@ -106,3 +106,6 @@ Thumbs.db
 # Config files (except default.yaml)
 src/multimodal_rssm/models/*/*/configs/*.yaml
 !src/multimodal_rssm/models/*/*/configs/default.yaml
+
+# Results
+evaluation/results/
