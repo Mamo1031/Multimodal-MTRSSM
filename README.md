@@ -101,22 +101,26 @@ Multimodal-MTRSSM/
 │       │       ├── callback.py      # MoPoE-MRSSM callbacks
 │       │       └── configs/
 │       │           └── default.yaml
-│       └── mmtrssm/                 # Multimodal MTRSSM implementation (planned)
+│       └── mmtrssm/                 # Multimodal MTRSSM implementation
 │           ├── __init__.py
-│           ├── callback.py          # MMTRSSM callbacks (placeholder)
-│           ├── dataset.py           # MMTRSSM dataset (placeholder)
-│           ├── state.py             # MTRSSM-specific State (placeholder)
-│           └── mopoe_mmtrssm/       # MoPoE-MMTRSSM model (planned)
+│           ├── callback.py          # MMTRSSM callbacks
+│           ├── state.py             # MTRSSM-specific State (MTState)
+│           └── mopoe_mmtrssm/       # MoPoE-MMTRSSM model
 │               ├── __init__.py
-│               ├── core.py          # MoPoE-MMTRSSM implementation (placeholder)
-│               ├── callback.py      # MoPoE-MMTRSSM callbacks (placeholder)
+│               ├── core.py          # MoPoE-MMTRSSM implementation
+│               ├── callback.py      # MoPoE-MMTRSSM callbacks
 │               └── configs/
 │                   └── default.yaml
+├── evaluation/                      # Evaluation scripts
+│   ├── __init__.py
+│   ├── evaluate_word_transitions_mrssm.py    # MoPoE-MRSSM evaluation
+│   ├── evaluate_word_transitions_mtmrssm.py  # MoPoE-MMTRSSM evaluation
+│   └── mnist_classifier.py          # MNIST classifier for digit recognition
 ├── scripts/                         # Training scripts
 │   ├── __init__.py
 │   ├── _train_common.py             # Common training utilities
 │   ├── train_mopoe_mrssm.py         # MoPoE-MRSSM training script
-│   └── train_mopoe_mmtrssm.py       # MoPoE-MMTRSSM training script (placeholder)
+│   └── train_mopoe_mmtrssm.py       # MoPoE-MMTRSSM training script
 ├── data/                            # Data directory
 │   └── .gitkeep
 ├── pyproject.toml                   # Project configuration
