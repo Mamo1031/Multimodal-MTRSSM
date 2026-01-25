@@ -203,50 +203,6 @@ class MoPoE_MMTRSSM(MoPoE_MRSSM):  # noqa: N801
         """
         return self.hd_dim + self.hs_dim + self.ld_dim + self.ls_dim
 
-    def get_observations_from_batch(self, batch: tuple[Tensor, ...]) -> tuple[Tensor, Tensor]:
-        """Extract observation sequences from batch.
-
-        Args:
-            batch: Batch tuple.
-                Format: (action_input, audio_obs_input, vision_obs_input,
-                        action_target, audio_obs_target, vision_obs_target)
-
-        Returns
-        -------
-        tuple[Tensor, Tensor]: (audio_obs_input, vision_obs_input) each shape: [B, T, ...]
-        """
-        return batch[1], batch[2]
-
-    def get_initial_observation(self, observations: tuple[Tensor, Tensor]) -> tuple[Tensor, Tensor]:
-        """Extract initial observations from observation sequences.
-
-        Args:
-            observations: Tuple of (audio_obs, vision_obs) each shape: [B, T, ...]
-
-        Returns
-        -------
-        tuple[Tensor, Tensor]: Initial observations each shape: [B, ...]
-        """
-        audio_obs, vision_obs = observations
-        return audio_obs[:, 0], vision_obs[:, 0]
-
-    def get_targets_from_batch(self, batch: tuple[Tensor, ...]) -> dict[str, Tensor]:
-        """Extract reconstruction targets from batch.
-
-        Args:
-            batch: Batch tuple.
-                Format: (action_input, audio_obs_input, vision_obs_input,
-                        action_target, audio_obs_target, vision_obs_target)
-
-        Returns
-        -------
-        dict[str, Tensor]: Dictionary with "recon/audio" and "recon/vision" keys.
-        """
-        return {
-            "recon/audio": batch[4],
-            "recon/vision": batch[5],
-        }
-
     def _set_prev_hiddens(
         self,
         batch_size: int,
